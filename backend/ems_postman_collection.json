@@ -1,0 +1,272 @@
+{
+  "info": {
+    "name": "Employee Management System API Final",
+    "description": "API Tests for EMS with JWT Authentication matching user requirements",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "admin_jwt_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_jwt_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "employee_management_system",
+      "item": [
+        {
+          "name": "Get All Employees",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_jwt_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/employees/", "host": ["{{base_url}}"], "path": ["employees", ""] }
+          }
+        },
+        {
+          "name": "Get All Employee by Department",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_jwt_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/employees/department/Engineering", "host": ["{{base_url}}"], "path": ["employees", "department", "Engineering"] }
+          }
+        },
+        {
+          "name": "Get All Employee by Employee Id",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_jwt_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/employees/E999", "host": ["{{base_url}}"], "path": ["employees", "E999"] }
+          }
+        },
+        {
+          "name": "Search employees by name",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_jwt_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/employees/search?name=Postman",
+              "host": ["{{base_url}}"],
+              "path": ["employees", "search"],
+              "query": [{ "key": "name", "value": "Postman" }]
+            }
+          }
+        },
+        {
+          "name": "Create an employee",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_jwt_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employee_id\": \"E999\",\n  \"name\": \"Postman Tester\",\n  \"position\": \"QA Engineer\",\n  \"department\": \"Engineering\",\n  \"email\": \"qa@example.com\",\n  \"salary\": 85000,\n  \"status\": \"active\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/employees/", "host": ["{{base_url}}"], "path": ["employees", ""] }
+          }
+        },
+        {
+          "name": "Update an employee",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_jwt_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employee_id\": \"E999\",\n  \"name\": \"Postman Tester Updated\",\n  \"position\": \"QA Engineer\",\n  \"department\": \"Engineering\",\n  \"email\": \"qa@example.com\",\n  \"salary\": 90000,\n  \"status\": \"active\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/employees/E999", "host": ["{{base_url}}"], "path": ["employees", "E999"] }
+          }
+        },
+        {
+          "name": "Update an employee Copy",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_jwt_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/employees/E999", "host": ["{{base_url}}"], "path": ["employees", "E999"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Security",
+      "item": [
+        {
+          "name": "BA - User - Get all employees",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{user_jwt_token}}", "type": "string" } ] },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/employees", "host": ["{{base_url}}"], "path": ["employees"] }
+          }
+        },
+        {
+          "name": "BA -User - Post an employee",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{user_jwt_token}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employee_id\": \"E111\",\n  \"name\": \"Bad Actor\",\n  \"position\": \"Hacker\",\n  \"department\": \"Security\",\n  \"email\": \"bad@example.com\",\n  \"salary\": 0,\n  \"status\": \"active\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/employees", "host": ["{{base_url}}"], "path": ["employees"] }
+          }
+        },
+        {
+          "name": "Admin DB Register - New User",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin_user\",\n  \"email\": \"admin@company.com\",\n  \"password\": \"adminpwd\",\n  \"role\": \"admin\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/users/register", "host": ["{{base_url}}"], "path": ["users", "register"] }
+          }
+        },
+        {
+          "name": "Admin Login - Token",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin_user\",\n  \"password\": \"adminpwd\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/users/login", "host": ["{{base_url}}"], "path": ["users", "login"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "    pm.collectionVariables.set(\"admin_jwt_token\", jsonData.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin DB Login - Token",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin_user\",\n  \"password\": \"adminpwd\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/users/login", "host": ["{{base_url}}"], "path": ["users", "login"] }
+          }
+        },
+        {
+          "name": "User DB Register - New User",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"standard_user\",\n  \"email\": \"user@company.com\",\n  \"password\": \"userpwd\",\n  \"role\": \"user\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/users/register", "host": ["{{base_url}}"], "path": ["users", "register"] }
+          }
+        },
+        {
+          "name": "User Login - Token",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"standard_user\",\n  \"password\": \"userpwd\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/users/login", "host": ["{{base_url}}"], "path": ["users", "login"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "    pm.collectionVariables.set(\"user_jwt_token\", jsonData.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "User Login - Get all employees",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{user_jwt_token}}", "type": "string" } ] },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/employees", "host": ["{{base_url}}"], "path": ["employees"] }
+          }
+        },
+        {
+          "name": "Admin Login - Get all employees",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{admin_jwt_token}}", "type": "string" } ] },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/employees", "host": ["{{base_url}}"], "path": ["employees"] }
+          }
+        },
+        {
+          "name": "User Login - Post an employee",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{user_jwt_token}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employee_id\": \"E123\",\n  \"name\": \"Test\",\n  \"position\": \"Test\",\n  \"department\": \"Test\",\n  \"email\": \"test@example.com\",\n  \"salary\": 1000,\n  \"status\": \"active\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/employees", "host": ["{{base_url}}"], "path": ["employees"] }
+          }
+        },
+        {
+          "name": "Admin Login - Post an employee",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{admin_jwt_token}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employee_id\": \"E124\",\n  \"name\": \"Admin Test\",\n  \"position\": \"Admin Test\",\n  \"department\": \"Admin Test\",\n  \"email\": \"admin.test@example.com\",\n  \"salary\": 1000,\n  \"status\": \"active\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/employees", "host": ["{{base_url}}"], "path": ["employees"] }
+          }
+        }
+      ]
+    }
+  ]
+}
