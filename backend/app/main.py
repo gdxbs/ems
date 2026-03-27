@@ -1,5 +1,6 @@
 #Bootstrap employee management system backend
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.config.database import client, db
 from contextlib import asynccontextmanager
 from app.routes.employee_routes import router as employee_routes
@@ -21,18 +22,21 @@ async def lifespan(app: FastAPI):
     #Shutdown code
     print("Shutting down Employee Management System API...")
 
- #Insert into employees collection
-#db.employees.insert_one({
-#    "employee_id": "E001",
-#    "name": "John Doe",
-#    "position": "Software Engineer",
-#    "department": "Engineering",
-#    "email": "john.doe@example.com",
-#    "salary": 90000,
-#    "status": "active"
-#})
-
 app = FastAPI(title = "Employee Management System API", version="1.0", lifespan=lifespan)
+
+# CORS Configuration
+origins = [
+    "http://localhost:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(employee_routes, prefix="/employees")
 app.include_router(user_routes, prefix="/users", tags=["Users"])
 

@@ -5,6 +5,9 @@ import uuid
 def get_user_by_username(username: str):
     return db.users.find_one({"username": username})
 
+def get_user_by_email(email: str):
+    return db.users.find_one({"email": email})
+
 def get_user_by_id(userid: str):
     return db.users.find_one({"userid": userid})
 

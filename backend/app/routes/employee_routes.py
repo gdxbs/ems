@@ -22,8 +22,8 @@ def create_employee_route(employee_data: EmployeeCreate):
     return add_employee(employee_data)
 
 @router.get("/search", response_model=list[Employee])
-def search_employees(name: str):
-    return fetch_employees_by_name(name)
+def search_employees(name: str | None = None, department: str | None = None):
+    return fetch_employees_by_name(name, department)
 
 @router.get("/department/{department}", response_model=list[Employee])
 def get_employees_by_dept(department: str):

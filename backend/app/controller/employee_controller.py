@@ -49,12 +49,12 @@ def fetch_employees_by_department(department: str):
         logger.error(f"Error fetching employees by department: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-def fetch_employees_by_name(name: str):
+def fetch_employees_by_name(name: str | None = None, department: str | None = None):
     try:
-        employees = get_employees_by_name(name)
+        employees = get_employees_by_name(name, department)
         return [Employee(**emp) for emp in employees]
     except Exception as e:
-        logger.error(f"Error fetching employees by name: {e}")
+        logger.error(f"Error fetching employees by name/department: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
 def modify_employee(employee_id: str, employee_data: EmployeeCreate):

@@ -17,9 +17,16 @@ def get_employees_by_department(department: str):
     escaped_dept = re.escape(department)
     return list(db.employees.find({"department": {"$regex": f"^{escaped_dept}$", "$options": "i"}}, {"_id": 0}))
 
-def get_employees_by_name(name: str):
-    escaped_name = re.escape(name)
-    return list(db.employees.find({"name": {"$regex": escaped_name, "$options": "i"}}, {"_id": 0}))
+def get_employees_by_name(name: str | None = None, department: str | None = None):
+    query = {}
+    if name:
+        escaped_name = re.escape(name)
+        query["name"] = {"$regex": escaped_name, "$options": "i"}
+    if department:
+        escaped_dept = re.escape(department)
+        query["department"] = {"$regex": f"^{escaped_dept}$", "$options": "i"}
+    
+    return list(db.employees.find(query, {"_id": 0}))
 
 def update_employee(employee_id: str, employee_data: dict):
     result = db.employees.update_one(

@@ -1,6 +1,6 @@
 from fastapi import HTTPException, status
 from app.schema.user_schema import UserCreate, UserLogin
-from app.model.user_model import get_user_by_username, create_user, capture_user_activity
+from app.model.user_model import get_user_by_username, get_user_by_email, create_user, capture_user_activity
 from app.utils.utils import get_password_hash, verify_password, create_access_token
 from datetime import timedelta
 import os
@@ -13,6 +13,14 @@ def register_new_user(user_data: UserCreate):
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, 
             detail="Username already registered"
+        )
+    
+    # Check if email is already registered
+    existing_email = get_user_by_email(user_data.email)
+    if existing_email:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, 
+            detail="Email already registered"
         )
     
     # Use fallback for Pydantic v1 vs v2 compatibility
@@ -36,11 +44,13 @@ def register_new_user(user_data: UserCreate):
     return new_user
 
 def login_user(user_data: UserLogin):
-    db_user = get_user_by_username(user_data.username)
+    # Try username first, then email
+    db_user = get_user_by_username(user_data.username) or get_user_by_email(user_data.username)
+    
     if not db_user or not verify_password(user_data.password, db_user["password"]):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Incorrect username/email or password",
         )
     
     capture_user_activity(db_user["userid"], "User logged in")
