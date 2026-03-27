@@ -6,7 +6,7 @@ from app.utils.utils import create_access_token
 client = TestClient(app)
 
 def get_auth_headers():
-    token = create_access_token(data={"username": "testuser", "role": "admin"})
+    token = create_access_token(data={"sub": "testuser", "role": "admin"})
     return {"Authorization": f"Bearer {token}"}
 
 def test_unauthorized_access():
@@ -46,6 +46,13 @@ def test_add_employee():
     # Test duplicate employee
     response = client.post("/employees", json=payload, headers=get_auth_headers())
     assert response.status_code == 400
+
+    # Test duplicate email validation
+    duplicate_email_payload = payload.copy()
+    duplicate_email_payload["employee_id"] = "E003" # New ID but same email
+    response = client.post("/employees", json=duplicate_email_payload, headers=get_auth_headers())
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Employee with this email already exists"
 
 #Update an employee test case /employee/{employee_id} PUT endpoint
 def test_update_employee():
@@ -95,3 +102,13 @@ def test_delete_employee():
     
     response = client.delete("/employees/NON_EXISTENT", headers=get_auth_headers())
     assert response.status_code == 404
+
+#Test cases for the GET /employees/summary endpoint
+def test_get_employee_summary():
+    response = client.get("/employees/summary", headers=get_auth_headers())
+    assert response.status_code == 200
+    data = response.json()
+    assert "total_employees" in data
+    assert "departments" in data
+    assert isinstance(data["total_employees"], int)
+    assert isinstance(data["departments"], list)
