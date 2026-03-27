@@ -5,7 +5,8 @@ from app.controller.employee_controller import (
     fetch_employees_by_department,
     fetch_employees_by_name,
     modify_employee,
-    remove_employee
+    remove_employee,
+    fetch_employee_summary
 )
 from app.schema.employee_schema import Employee, EmployeeCreate
 from app.utils.utils import get_current_user, admin_required
@@ -15,6 +16,10 @@ router = APIRouter(dependencies=[Depends(get_current_user)])
 @router.get("/", response_model=list[Employee])
 def get_employees():
     return fetch_all_employees()
+
+@router.get("/summary")
+def get_employee_summary():
+    return fetch_employee_summary()
 
 @router.post("/", status_code=201, dependencies=[Depends(admin_required)])
 def create_employee_route(employee_data: EmployeeCreate):

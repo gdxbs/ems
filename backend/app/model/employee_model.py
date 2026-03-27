@@ -6,6 +6,14 @@ from app.config.database import db
 def get_all_employees():
     return list(db.employees.find({}, {"_id": 0}))
 
+def get_employee_summary():
+    total_employees = db.employees.count_documents({})
+    departments = db.employees.distinct("department")
+    return {
+        "total_employees": total_employees,
+        "departments": departments
+    }
+
 def create_employee(employee_data: dict):
     db.employees.insert_one(employee_data)
     return True
@@ -16,6 +24,9 @@ def get_employee_by_id(employee_id: str):
 def get_employees_by_department(department: str):
     escaped_dept = re.escape(department)
     return list(db.employees.find({"department": {"$regex": f"^{escaped_dept}$", "$options": "i"}}, {"_id": 0}))
+
+def get_employee_by_email(email: str):
+    return db.employees.find_one({"email": email}, {"_id": 0})
 
 def get_employees_by_name(name: str):
     escaped_name = re.escape(name)
