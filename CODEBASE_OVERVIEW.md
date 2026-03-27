@@ -59,9 +59,14 @@ Defines Pydantic models used for input validation and output serialization.
 ### Utilities (`app/utils/`)
 *   **`utils.py`**: Contains authentication and security utilities. It manages JWT creation (`create_access_token`), password hashing/verification using `passlib` (Argon2), and FastAPI dependencies (`get_current_user`, `admin_required`) to secure endpoints.
 
-### Testing & Scripts (`tests/` and root backend files)
-*   **`tests/`**: Contains `pytest` files (`test_auth.py`, `employees_test.py`) for automated testing of endpoints.
-*   **Helper Scripts**: `seed_db.py`, `update_admin.py`, and `verify_apis.py` are utility scripts to populate the database and verify the API outside of standard tests.
+### Tests and Testing Configuration (`tests/`)
+The backend is tested using `pytest` and `pytest-asyncio`. A local MongoDB instance (`mongod`) is required to run the tests.
+*   **`tests/conftest.py`**: Contains shared Pytest fixtures.
+*   **`tests/employees_test.py`**: Uses `fastapi.testclient.TestClient` to test the API endpoints. It mocks authorization headers by generating valid admin JWT tokens using `create_access_token` and validates the HTTP response codes and JSON bodies (e.g., asserting a `201` status code and a success message when an employee is successfully created).
+*   **`tests/test_auth.py`**: Tests authentication logic such as duplicate username registration handling, weak password validations, login functionality, and role-based access to protected routes.
+
+### Configuration & Dependency Files
+*   **`requirements.txt`**: Lists all Python dependencies such as `fastapi`, `pymongo`, `pytest`, `pydantic`, `python-jose`, and `passlib`.
 
 ---
 
@@ -92,6 +97,16 @@ The frontend is a modern React application utilizing Vite for fast bundling.
 *   **`employee-modal.tsx`**: A form modal used for creating and editing employee details.
 *   **`protected-route.tsx`**: A wrapper component that restricts access to authenticated users or admins.
 *   **`layout.tsx`**: The main application layout, including the navigation sidebar.
+
+### Tests and Testing Configuration
+Frontend unit and component testing is set up using **Vitest** and **React Testing Library**. Tests are executed via `npm run test` (mapped to `vitest`).
+*   **`src/setupTests.js`**: Setup script initialized by Vitest before tests run, usually to extend `expect` matchers with `@testing-library/jest-dom`.
+*   Test files are designed to evaluate React component rendering and user interactions using a simulated DOM (`jsdom`).
+
+### Configuration & Dependency Files
+*   **`vite.config.ts`**: Configures the Vite bundler. It uses `@vitejs/plugin-react` for React support and `@tailwindcss/vite` for styling. It also establishes the test environment (`jsdom`, global variables, and pointing to `setupTests.js`) and defines absolute path aliases (`@/` -> `./src`).
+*   **`tsconfig.json` & `tsconfig.node.json`**: TypeScript configuration files establishing compiler settings (e.g., target `ES2020`, isolated modules, strict type-checking, and path alias mapping).
+*   **`package.json`**: Contains all NPM dependencies (React, Radix UI, Recharts, Vite, Vitest) and scripts for building, previewing, and testing the application.
 
 ---
 
